@@ -6,7 +6,7 @@ if [ "$#" == 2 ]; then
     export CATKIN_WS=~/thorvald_ws
   else
     echo "Launching software for raspberry setup"
-    export CATKIN_WS=~/software_catkin_ws
+    export CATKIN_WS=~/software/catkin_ws
   fi
 
   cd $CATKIN_WS

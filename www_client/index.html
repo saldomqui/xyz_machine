@@ -64,7 +64,8 @@
 		}
 
 		$(document).ready(function () {
-			var socket = new SocketWrapper("ws://127.0.0.1:8080");
+                        console.log(window.location.href)
+			var socket = new SocketWrapper("ws://"+window.location.host+":8080");
 
 			//Generic events
 
@@ -88,13 +89,14 @@
 
 			socket.on('machineState', function (args) {
 				//log("Received machine state: \"" + args['input'] + "\"");
-				console.log(args);
+				//console.log(args);
 				document.getElementById('x_pos_id').value = args['x_pos'];
 				document.getElementById('y_pos_id').value = args['y_pos'];
 				document.getElementById('z_pos_id').value = args['z_pos'];
 				document.getElementById('tool_pos_id').value = args['tool_pos'];
 			});
 
+                        document.getElementById('cam_id').src = "http://"+window.location.host+":8888";
 		});
 
 	</script>
@@ -114,6 +116,11 @@
 		<div class="col-3">
 			<input type="text" id="tool_pos_id" value=''>
 		</div>
+	</div>
+	<div class="row"> <!-- Camera image -->
+         <div class="col-12">
+           <iframe id="cam_id" width="800" height="600" title="Camera image" />
+         </div>
 	</div>
 	<div class="row" id="status"> <!-- Status bar-->
 	</div>
