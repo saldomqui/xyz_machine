@@ -9,4 +9,13 @@
     width: 100%;
 }
   
+#cam_img_raw_id {
+    display: none;
+    width: auto;
+    height: auto;
+}
 
+#canvas_id{
+    display: block;
+    width: 100%;
+}

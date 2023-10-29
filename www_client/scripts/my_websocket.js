@@ -1,3 +1,7 @@
+let cam_img_raw = 0;
+let canvas = 0;
+var canvas_ctx = 0;
+
 function SocketWrapper(init) {
     this.socket = new SimpleWebsocket(init);
     this.messageHandlers = {};
@@ -47,18 +51,19 @@ SocketWrapper.prototype.send = function (message, payload) {
     this.socket.send(JSON.stringify(payloadCopy));
 }
 
-function log(text) {
-    document.getElementById('status').innerHTML = text;
+function logStatus(text) {
+    if (document.getElementById('status'))
+        document.getElementById('status').innerHTML = text;
 }
 
 $(document).ready(function () {
-                console.log(window.location.href)
-    var socket = new SocketWrapper("ws://"+window.location.host+":8080");
+    //console.log(window.location.href)
+    var socket = new SocketWrapper("ws://" + window.location.host + ":8080");
 
     //Generic events
 
     socket.on('connect', function () {
-        log("socket is connected!");
+        logStatus("socket is connected!");
     });
 
     socket.on('data', function (data) {
@@ -66,23 +71,23 @@ $(document).ready(function () {
     });
 
     socket.on('close', function () {
-        log("socket is disconnected!");
+        logStatus("socket is disconnected!");
     });
 
     socket.on('error', function (err) {
-        log("Error: " + err);
+        logStatus("Error: " + err);
     });
 
     //Specific message type handlers
 
     socket.on('machineState', function (args) {
         //log("Received machine state: \"" + args['input'] + "\"");
-        //console.log(args);
-        document.getElementById('x_pos_id').value = args['x_pos'];
-        document.getElementById('y_pos_id').value = args['y_pos'];
-        document.getElementById('z_pos_id').value = args['z_pos'];
-        document.getElementById('tool_pos_id').value = args['tool_pos'];
-    });
+        //console.log(args['x_pos']);
 
-                document.getElementById('cam_id').src = "http://"+window.location.host+":8888";
+        if (document.getElementById('x_pos_id')) document.getElementById('x_pos_id').value = args['x_pos'];
+        if (document.getElementById('y_pos_id')) document.getElementById('y_pos_id').value = args['y_pos'];
+        if (document.getElementById('z_pos_id')) document.getElementById('z_pos_id').value = args['z_pos'];
+        if (document.getElementById('tool_pos_id')) document.getElementById('tool_pos_id').value = args['tool_pos'];
+    });
 });
+

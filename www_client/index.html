@@ -1,40 +1,99 @@
 <!doctype html>
 <html>
 
-<link rel="stylesheet" type="text/css" href="css/bootstrap-4.0.0.css" />
-<link rel="stylesheet" type="text/css" href="css/style.css" />
-
 <head>
-	<title>XYZ Machine GUI</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no">
+
+	<link rel="stylesheet" type="text/css" href="css/bootstrap-4.0.0.css" />
+	<link rel="stylesheet" type="text/css" href="css/style.css" />
 
 	<script type="text/javascript" src="scripts/jquery-3.1.1.min.js"></script>
 	<script type="text/javascript" src="scripts/simplewebsocket.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
 	<script type="text/javascript" src="scripts/my_websocket.js"></script>
+
+	<title>XYZ Machine GUI</title>
 </head>
 
 <body>
-	<div class="row" id="data_id">
-		<div class="col-3">
-			<input type="text" id="x_pos_id" value=''>
+	<div class="row">
+		<div class="col-8">
+			<img id="cam_img_raw_id">
+			<canvas id="canvas_id" onmousemove="mouse(event)"></canvas>
+			<!--iframe id="cam_id" width="100%" height="800" title="Camera image"></iframe-->
 		</div>
-		<div class="col-3">
-			<input type="text" id="y_pos_id" value=''>
-		</div>
-		<div class="col-3">
-			<input type="text" id="z_pos_id" value=''>
-		</div>
-		<div class="col-3">
-			<input type="text" id="tool_pos_id" value=''>
+		<div class="col-4">
+			<div class="row" id="data_id">
+				<div class="col-12">
+					<div class="row">
+						<div class="col-12">
+							<input type="text" id="x_pos_id" value=''>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-12">
+							<input type="text" id="y_pos_id" value=''>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-12">
+							<input type="text" id="z_pos_id" value=''>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-12">
+							<input type="text" id="tool_pos_id" value=''>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
-	<div class="row"> <!-- Camera image -->
-         <div class="col-12">
-           <iframe id="cam_id" width="800" height="600" title="Camera image" />
-         </div>
+	<div class="row"> <!-- Status bar-->
+		<div id="status"></div>
 	</div>
-	<div class="row" id="status"> <!-- Status bar-->
-	</div>
-
 </body>
+
+<script>
+	function mouse(e) {
+		//var canvas = document.getElementById("imgCanvas");
+		//var context = canvas.getContext("2d");
+		//posx = e.clientX;
+		//posy = e.clientY;
+		//context.fillStyle = "#000000";
+		//context.fillRect (posx, posy, 4, 4);
+		console.log("mouse x:" + e.clientX + " y:" + e.clientY);
+	}
+
+	function setup() {
+		console.log("setting up");
+
+		cam_img_raw = document.getElementById('cam_img_raw_id');
+		cam_img_raw.src = "http://" + window.location.host + ":8888?quality=100";
+
+		cam_img_raw.onload = function () {
+			console.log("input img width:" + this.width + " height:" + this.height);
+			canvas = document.getElementById('canvas_id');
+
+			canvas.height = (canvas.width * this.height) / this.width;
+
+			console.log("Canvas div width:" + canvas.offsetWidth + " height:" + canvas.offsetHeight);
+
+			canvas_ctx = canvas.getContext('2d');
+		}
+	}
+
+	function draw() {
+		if (canvas != 0) {
+			canvas_ctx.drawImage(cam_img_raw, 0, 0, canvas.offsetWidth, canvas.offsetHeight, 0, 0, cam_img_raw.width, cam_img_raw.height);
+			//canvas_ctx.fillStyle = "#FF0000";
+			//canvas_ctx.fillRect(10, 10, 100, 100);
+			//canvas_ctx.font = "10px Arial";
+			//canvas_ctx.fillStyle = "black";
+			//canvas_ctx.fillText("Hello World", 20, 40);
+		}
+	}
+</script>
 
 </html>
