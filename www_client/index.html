@@ -1,99 +1,127 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
 
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<meta name="viewport" content="width=device-width, user-scalable=no">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-	<link rel="stylesheet" type="text/css" href="css/bootstrap-4.0.0.css" />
-	<link rel="stylesheet" type="text/css" href="css/style.css" />
+  <link rel="stylesheet" type="text/css" href="css/bootstrap-4.0.0.css" />
+  <link rel="stylesheet" type="text/css" href="css/style.css" />
 
-	<script type="text/javascript" src="scripts/jquery-3.1.1.min.js"></script>
-	<script type="text/javascript" src="scripts/simplewebsocket.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
-	<script type="text/javascript" src="scripts/my_websocket.js"></script>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no">
 
-	<title>XYZ Machine GUI</title>
+  <script type="text/javascript" src="scripts/jquery-3.1.1.min.js"></script>
+  <script type="text/javascript" src="scripts/simplewebsocket.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+  <script type="text/javascript" src="scripts/dragscroll.js"></script>
+  <script type="text/javascript" src="scripts/my_websocket.js"></script>
+  <script type="text/javascript" src="scripts/main.js"></script>
+
+  <title>XYZ Machine. Main menu</title>
+
 </head>
 
 <body>
-	<div class="row">
-		<div class="col-8">
-			<img id="cam_img_raw_id">
-			<canvas id="canvas_id" onmousemove="mouse(event)"></canvas>
-			<!--iframe id="cam_id" width="100%" height="800" title="Camera image"></iframe-->
-		</div>
-		<div class="col-4">
-			<div class="row" id="data_id">
-				<div class="col-12">
-					<div class="row">
-						<div class="col-12">
-							<input type="text" id="x_pos_id" value=''>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-12">
-							<input type="text" id="y_pos_id" value=''>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-12">
-							<input type="text" id="z_pos_id" value=''>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-12">
-							<input type="text" id="tool_pos_id" value=''>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="row"> <!-- Status bar-->
-		<div id="status"></div>
-	</div>
+  <div id="container_id">
+    <center>
+      <h1>XYZ Machine. Main menu</h1>
+    </center>
+    <div class="btn-group-vertical">
+      <button type="button" onClick="showCalibrationInterface()">Calibrate</button>
+      <button type="button" onClick="showScannerInterface()">Scan</button>
+    </div>
+  </div>
+
+  <div id="calibration_section_id">
+    <img id="cam_img_raw_id">
+    <center><canvas id="canvas_id" onmousemove="mouse(event)" onclick="canvas_click(event)" ></canvas></center><br>
+    <div class="row">
+      <div class="col-sm-4">
+
+      </div>
+      <div class="col-sm-2">
+        <center>
+          <input class="set_button" type="button" id="bt_close_calibration_id" onClick="CloseCalibrationInterface()"
+            value="Return">
+          <input class="set_button" type="button" id="bt_calibrate_id" onClick="Calibrate()" value="Calibrate">
+        </center>
+      </div>
+      <div class="col-sm-4">
+        <form>
+          <label for="calibration_coef_id"><strong>pixel/mm coefficient:
+            </strong></label>&emsp;<input type="number" id="calibration_coef_id" min="0.0" max="100.0" step="0.1"
+            value="0.0" size="20" /><br>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="scan_section_id">
+    <input class="set_button" type="button" id="bt_close_scanner_id" onClick="CloseScannerInterface()"
+      value="Return"><br>
+    <div id="scan_side_pannel">
+      <form>
+        <label for="x_pos_id"><strong>x[mm]:
+          </strong></label>&emsp;<input type="number" id="x_pos_id" min="0.0" max="300.0" step="0.03" value="0.0"
+          size="20" /><br>
+      </form>
+      <form>
+        <label for="y_pos_id"><strong>y[mm]:
+          </strong></label>&emsp;<input type="number" id="y_pos_id" min="0.0" max="300.0" step="0.03" value="0.0"
+          size="20" /><br>
+      </form>
+      <form>
+        <label for="z_pos_id"><strong>z[mm]:
+          </strong></label>&emsp;<input type="number" id="z_pos_id" min="0.0" max="300.0" step="0.03" value="0.0"
+          size="20" /><br>
+      </form>
+      <form>
+        <label for="tool_pos_id"><strong> tool:
+          </strong></label>&emsp;<input type="number" id="tool_pos_id" min="0.0" max="300.0" step="0.03" value="0.0"
+          size="20" /><br>
+      </form>
+      <input class="set_button" type="button" id="bt_project_img_id" onClick="projectImage()"
+        value="Project image">
+    </div>
+
+    <div id="scan_canvas_frame_id" class="dragscroll" >
+      <canvas id="scan_canvas_id" onmousemove="mouse(event)" ></canvas>
+      <canvas id="scan_canvas_background_id" style="display: none"></canvas>
+    </div>
+  </div>
+  </div>
+
+  <div id="status"> <!-- Status bar-->
+    Please select one of the options
+  </div>
+
+  <div id="calibration_dist_dialog" class="dialog_modal">
+    <!-- Modal content -->
+    <div class="dialog_modal-content">
+      <div class="row">
+        <div id="calibration_dist_params_id">
+          <h3> Calibration parameters:</h3>
+          <br>
+          <form>
+            <label for="calibration_distance_id"><strong>calibration distance [mm]:
+              </strong></label>&emsp;<input type="number" id="calibration_distance_id" min="0.1" max="100.0" step="0.1"
+              value="1.0" size="20" /><br>
+          </form>
+        </div>
+      </div>
+      <input class="set_button" type="button" id="bt_close_calibration_dist_id"
+        onclick="ApplyCalibrationDistanceDialog();" value="Apply">
+    </div>
+  </div>
+
+  <!-- Processing spinner -->
+  <div id="processing_id" disabled>
+    <div class="spinner"></div>
+    <div class="text_spinner">
+      <p>Processing...</p>
+      <p>please wait</p>
+    </div>
+  </div>
+
 </body>
-
-<script>
-	function mouse(e) {
-		//var canvas = document.getElementById("imgCanvas");
-		//var context = canvas.getContext("2d");
-		//posx = e.clientX;
-		//posy = e.clientY;
-		//context.fillStyle = "#000000";
-		//context.fillRect (posx, posy, 4, 4);
-		console.log("mouse x:" + e.clientX + " y:" + e.clientY);
-	}
-
-	function setup() {
-		console.log("setting up");
-
-		cam_img_raw = document.getElementById('cam_img_raw_id');
-		cam_img_raw.src = "http://" + window.location.host + ":8888?quality=100";
-
-		cam_img_raw.onload = function () {
-			console.log("input img width:" + this.width + " height:" + this.height);
-			canvas = document.getElementById('canvas_id');
-
-			canvas.height = (canvas.width * this.height) / this.width;
-
-			console.log("Canvas div width:" + canvas.offsetWidth + " height:" + canvas.offsetHeight);
-
-			canvas_ctx = canvas.getContext('2d');
-		}
-	}
-
-	function draw() {
-		if (canvas != 0) {
-			canvas_ctx.drawImage(cam_img_raw, 0, 0, canvas.offsetWidth, canvas.offsetHeight, 0, 0, cam_img_raw.width, cam_img_raw.height);
-			//canvas_ctx.fillStyle = "#FF0000";
-			//canvas_ctx.fillRect(10, 10, 100, 100);
-			//canvas_ctx.font = "10px Arial";
-			//canvas_ctx.fillStyle = "black";
-			//canvas_ctx.fillText("Hello World", 20, 40);
-		}
-	}
-</script>
 
 </html>

@@ -1,6 +1,4 @@
 let cam_img_raw = 0;
-let canvas = 0;
-var canvas_ctx = 0;
 
 function SocketWrapper(init) {
     this.socket = new SimpleWebsocket(init);
@@ -82,12 +80,12 @@ $(document).ready(function () {
 
     socket.on('machineState', function (args) {
         //log("Received machine state: \"" + args['input'] + "\"");
-        //console.log(args['x_pos']);
+        //console.log("x:" + args['x_pos'] + ", y:" + args['y_pos'] + ", z:" + args['z_pos'] + ", tool:" + args['tool_pos']);
 
-        if (document.getElementById('x_pos_id')) document.getElementById('x_pos_id').value = args['x_pos'];
-        if (document.getElementById('y_pos_id')) document.getElementById('y_pos_id').value = args['y_pos'];
-        if (document.getElementById('z_pos_id')) document.getElementById('z_pos_id').value = args['z_pos'];
-        if (document.getElementById('tool_pos_id')) document.getElementById('tool_pos_id').value = args['tool_pos'];
+        document.getElementById('x_pos_id').value = parseFloat(args['x_pos']).toFixed(3);
+        document.getElementById('y_pos_id').value = parseFloat(args['y_pos']).toFixed(3);
+        document.getElementById('z_pos_id').value = parseFloat(args['z_pos']).toFixed(3);
+        document.getElementById('tool_pos_id').value = parseFloat(args['tool_pos']).toFixed(1);
     });
 });
 

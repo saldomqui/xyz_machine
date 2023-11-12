@@ -1,3 +1,115 @@
+body{
+  margin-top: 0;
+  padding-top: 0;
+  overflow: hidden;
+}
+
+#container_id {
+    width: 100%;
+    height: 100%;
+    background: var(--bg_col);
+    padding: 5px;
+    position: fixed;
+}
+
+#container_id:disabled {
+    background: #AAA;
+    color: #777;
+}
+
+
+.btn-group-vertical {
+    width: 100%;
+    /*
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    background: #084B8A55;
+    */
+}
+
+.btn-group-vertical button {
+    display: block;
+    margin: auto;
+    margin-top: 20px;
+    padding: 10px 24px;
+    background-color: #04AA6D;
+    color: white;
+    font: bold 25px verdana, sans-serif;
+    cursor: pointer;
+    border: 1px solid green;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+}
+
+.btn-group-vertical button:not(:last-child) {
+    border-bottom: none;
+}
+
+/* Add a background color on hover */
+.btn-group-vertical button:hover {
+    background-color: #3e8e41;
+}
+
+#processing_id {
+    display: none;
+    position: fixed;
+    pointer-events: none;
+    z-index: 100;
+}
+
+#processing_id:disabled {
+    display: none;
+    /*  z-index: -100;*/
+}
+
+#processing_id:enabled {
+    display: block;
+    /*z-index: 100; */
+}
+
+.text_spinner {
+    position: fixed;
+    background: transparent;
+    left: 33%;
+    top: 32%;
+    overflow: auto;
+    text-align: center;
+    line-height: 150px;
+    font-family: sans-serif;
+    font-size: 25px;
+    color: #ff0000;
+    letter-spacing: 4px;
+    text-shadow: 0 0 10px #ff0000;
+}
+
+
+.spinner {
+    position: fixed;
+    left: 25%;
+    top: 25%;
+    overflow: auto;
+
+    border: 40px solid rgba(0, 0, 0, 0.1);
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    border-left-color: #09f;
+
+    animation: spin 1s ease infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
 #status {
     background: #aaa;
     border-top: solid 2px #888;
@@ -8,14 +120,123 @@
     position: fixed;
     width: 100%;
 }
-  
+
 #cam_img_raw_id {
     display: none;
     width: auto;
     height: auto;
 }
 
-#canvas_id{
-    display: block;
-    width: 100%;
+#calibration_section_id {
+    display: none;
+    margin-top: 30px;
 }
+
+.set_button {
+    color: #000;
+    overflow: hidden;
+    line-height: 35px;
+    border: 2px solid;
+    text-align: center;
+    padding: 5px;
+    font: bold 15px verdana, sans-serif;
+    -moz-box-shadow: rgb(50, 50, 50) 5px 5px 10px;
+    -webkit-box-shadow: rgb(50, 50, 50) 5px 5px 10px;
+    box-shadow: rgb(50, 50, 50) 5px 5px 10px;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+}
+
+.set_button:disabled {
+    background: #AAA;
+    color: #777;
+}
+
+.set_button:active {
+    transform: translateY(4px);
+    -moz-transform: translateY(4px);
+    -webkit-moz-transform: translateY(4px);
+}
+
+
+.dialog_modal {
+    display: none;
+    /* Hidden by default */
+    position: fixed;
+    /* Stay in place */
+    z-index: 1;
+    /* Sit on top */
+    padding-top: 100px;
+    /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%;
+    /* Full width */
+    height: 100%;
+    /* Full height */
+    overflow: auto;
+    /* Enable scroll if needed */
+    background-color: rgb(0, 0, 0);
+    /* Fallback color */
+    background-color: rgba(0, 0, 0, 0.4);
+    /* Black w/ opacity */
+  }
+  
+  /* Modal Content */
+  .dialog_modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 50px;
+    border: 5px solid #888;
+    width: 60%;
+    -moz-border-radius: 20px;
+    -webkit-border-radius: 20px;
+    border-radius: 20px;
+  }
+  
+  #scan_canvas_id{
+    background-color: black;
+    margin-top: 0;
+    padding-top: 0;
+  }
+
+  #bt_close_scanner_id{
+    position: fixed;
+    top: 0;
+    left: 0;
+  }
+
+  #scan_canvas_frame_id{
+    margin-top: 0;
+    padding-top: 0;
+    width: 1600px;
+    height: 850px;
+    overflow: hidden;
+  }
+
+  #scan_section_id{
+    display: none;
+    padding-top: 0;
+    margin-top: 0;
+    overflow: hidden;
+  }
+
+  #scan_side_pannel{
+    float: right;
+  }
+
+  .dragscroll {
+    overflow: auto;
+    cursor : -webkit-grab;
+    cursor : -moz-grab;
+    cursor : -o-grab;
+    cursor : grab;
+  }
+
+  .dragscroll:active {
+    cursor : -webkit-grabbing;
+    cursor : -moz-grabbing;
+    cursor : -o-grabbing;
+    cursor : grabbing;
+  }
