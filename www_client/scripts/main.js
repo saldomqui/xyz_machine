@@ -167,6 +167,19 @@ function mouse(e) {
     mousey = e.clientY;
 }
 
+function scan_canvas_click(e) {
+    let elem = document.getElementById('scan_canvas_frame_id');
+
+    //console.log("Canvas frame width:"+elem.offsetWidth + " mouse x:" + mx + " scroll:"+elem.scrollLeft);
+
+    let x_px = (e.clientX - scanner_canvas.offsetLeft + elem.scrollLeft) / zoom_scale;
+    let y_px = (e.clientY - scanner_canvas.offsetTop + elem.scrollTop) / zoom_scale;
+    let xy_mm = getMachineXYFromPxCoods(x_px, y_px);
+
+    console.log("Zoom scale:" + zoom_scale + " Clicked scan canvas at x:" + xy_mm[0] + " y:" + xy_mm[1]);
+    setMachineXYPos(xy_mm[0], xy_mm[1]);
+}
+
 function zoom(e) {
     console.log(e);
 }
@@ -222,7 +235,6 @@ function setup() {
         //console.log(canvas_ctx);
     }
 }
-
 
 function draw() {
     if (canvas != 0) {
@@ -290,6 +302,13 @@ function getPxCoordsFromMachineXY(x_mm, y_mm) {
     return [x_px, y_px];
 }
 
+function getMachineXYFromPxCoods(x_px, y_px) {
+    let x_mm = (x_px - (canvas.width / 2)) / px_per_mm_coef;
+    let y_mm = (y_px - (canvas.height / 2)) / px_per_mm_coef;
+
+    return [x_mm, y_mm];
+}
+
 
 function drawFrameOnScanCanvasAtPos(x_center, y_center) {
     let center_px = getPxCoordsFromMachineXY(x_center, y_center);
@@ -350,4 +369,12 @@ function computeNewScroll(mx, my, coef) {
     elem.scrollTo(new_scroll_x, new_scroll_y);
     //console.log("prev scroll x:" + curr_scroll_x + " new_scroll_x:" + elem.scrollLeft);
     //console.log("prev scroll y:" + curr_scroll_y + " new_scroll_y:" + elem.scrollTop);
+}
+
+function setMachineXYPos(x, y) {
+    const msg = {
+        x: x,
+        y: y
+    };
+    socket_ws.send("set_xy_pos", msg);
 }

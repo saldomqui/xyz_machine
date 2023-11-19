@@ -79,12 +79,28 @@
           </strong></label>&emsp;<input type="number" id="tool_pos_id" min="0.0" max="300.0" step="0.03" value="0.0"
           size="20" /><br>
       </form>
+
+      <form>
+        <label for="x_ref_id"><strong>x_ref[mm]:
+          </strong></label>&emsp;<input type="number" id="x_ref_id" min="0.0" max="300.0" step="0.03" value="0.0"
+          size="20" /><br>
+      </form>
+      <form>
+        <label for="y_ref_id"><strong>y_ref[mm]:
+          </strong></label>&emsp;<input type="number" id="y_ref_id" min="0.0" max="300.0" step="0.03" value="0.0"
+          size="20" /><br>
+      </form>
+      <form>
+        <label for="z_ref_id"><strong>z_ref[mm]:
+          </strong></label>&emsp;<input type="number" id="z_ref_id" min="0.0" max="300.0" step="0.03" value="0.0"
+          size="20" /><br>
+      </form>
       <input class="set_button" type="button" id="bt_project_img_id" onClick="projectImage()"
         value="Project image">
     </div>
 
     <div id="scan_canvas_frame_id" class="dragscroll" >
-      <canvas id="scan_canvas_id" onmousemove="mouse(event)" ></canvas>
+      <canvas id="scan_canvas_id" onmousemove="mouse(event)" onclick="scan_canvas_click(event)"></canvas>
       <canvas id="scan_canvas_background_id" style="display: none"></canvas>
     </div>
   </div>

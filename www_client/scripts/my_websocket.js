@@ -1,4 +1,5 @@
 let cam_img_raw = 0;
+var socket_ws = 0;
 
 function SocketWrapper(init) {
     this.socket = new SimpleWebsocket(init);
@@ -56,29 +57,29 @@ function logStatus(text) {
 
 $(document).ready(function () {
     //console.log(window.location.href)
-    var socket = new SocketWrapper("ws://" + window.location.host + ":8080");
+    socket_ws = new SocketWrapper("ws://" + window.location.host + ":8080");
 
     //Generic events
 
-    socket.on('connect', function () {
+    socket_ws.on('connect', function () {
         logStatus("socket is connected!");
     });
 
-    socket.on('data', function (data) {
+    socket_ws.on('data', function (data) {
         //log('got message: ' + data)
     });
 
-    socket.on('close', function () {
+    socket_ws.on('close', function () {
         logStatus("socket is disconnected!");
     });
 
-    socket.on('error', function (err) {
+    socket_ws.on('error', function (err) {
         logStatus("Error: " + err);
     });
 
     //Specific message type handlers
 
-    socket.on('machineState', function (args) {
+    socket_ws.on('machineState', function (args) {
         //log("Received machine state: \"" + args['input'] + "\"");
         //console.log("x:" + args['x_pos'] + ", y:" + args['y_pos'] + ", z:" + args['z_pos'] + ", tool:" + args['tool_pos']);
 
@@ -86,6 +87,42 @@ $(document).ready(function () {
         document.getElementById('y_pos_id').value = parseFloat(args['y_pos']).toFixed(3);
         document.getElementById('z_pos_id').value = parseFloat(args['z_pos']).toFixed(3);
         document.getElementById('tool_pos_id').value = parseFloat(args['tool_pos']).toFixed(1);
+        document.getElementById('x_ref_id').value = parseFloat(args['x_ref']).toFixed(3);
+        document.getElementById('y_ref_id').value = parseFloat(args['y_ref']).toFixed(3);
+        document.getElementById('z_ref_id').value = parseFloat(args['z_ref']).toFixed(3);
     });
+
+/*
+    window.addEventListener('keydown', function (e) {
+        let x_pos = this.document.getElementById('x_pos_id').value;
+        let y_pos = this.document.getElementById('y_pos_id').value;
+        let new_x_pos, new_y_pos;
+
+        console.log("Curr pos x:" + x_pos + " y:" + y_pos);
+        //console.log("Key pressed:"+e.key);
+        if (e.key == 'ArrowUp') {
+            // up arrow
+            console.log("key up");
+            new_x_pos = x_pos;
+            new_y_pos = y_pos + 1;
+            setMachineXYPos(new_x_pos, new_y_pos);
+        }
+        else if (e.key == 'ArrowDown') {
+            // down arrow
+            console.log("key down");
+            //setMachineXYPos(x_pos, y_pos + 1.0);
+        }
+        else if (e.key == 'ArrowLeft') {
+            // left arrow
+            console.log("key left");
+            //setMachineXYPos(x_pos - 1.0, y_pos);
+        }
+        else if (e.key == 'ArrowRight') {
+            // right arrow
+            console.log("key right");
+            //setMachineXYPos(x_pos + 1.0, y_pos);
+        }
+    })
+    */
 });
 

@@ -17,6 +17,7 @@ typedef struct config_
 typedef struct state_
 {
   float x_pos, y_pos, z_pos;
+  float x_ref, y_ref, z_ref;
   int tool_pos;
 } state;
 #endif

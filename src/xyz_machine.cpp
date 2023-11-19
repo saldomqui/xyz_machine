@@ -16,7 +16,7 @@
 #include <iostream>
 #include <vector>
 #include <ctime>
-#include <sstream>     
+#include <sstream>
 
 #include <serial/serial.h>
 #include <pthread.h>
@@ -46,6 +46,7 @@ string pck_path = "";
 
 std::mutex mutex;    // Mutex to synchronise access to shared variable
 state machine_state; // This is a shared variable
+serial::Serial ser;
 
 std::vector<std::string> stringSplit(const std::string &s, signed char separator);
 
@@ -218,7 +219,7 @@ std::vector<std::string> stringSplit(const std::string &s, signed char separator
   return output;
 }
 
-bool readStateFromserial(serial::Serial &ser, state &st)
+bool readStateFromserial(state &st)
 {
   if (ser.available())
   {
@@ -243,7 +244,7 @@ bool readStateFromserial(serial::Serial &ser, state &st)
     if (data.size() > 2)
     {
       // cout << "Read: " << data << endl;
-      sscanf(data.c_str(), "$%f,%f,%f,%d#", &st.x_pos, &st.y_pos, &st.z_pos, &st.tool_pos);
+      sscanf(data.c_str(), "$%f,%f,%f,%f,%f,%f,%d#", &st.x_pos, &st.y_pos, &st.z_pos, &st.x_ref, &st.y_ref, &st.z_ref, &st.tool_pos);
       return true;
     }
     else
@@ -258,6 +259,9 @@ void printState(const state &st)
   cout << "x_pos[mm]:" << st.x_pos << endl;
   cout << "y_pos[mm]:" << st.y_pos << endl;
   cout << "z_pos[mm]:" << st.z_pos << endl;
+  cout << "x_ref[mm]:" << st.x_ref << endl;
+  cout << "y_ref[mm]:" << st.y_ref << endl;
+  cout << "z_ref[mm]:" << st.z_ref << endl;
   cout << "tool_pos[]:" << st.tool_pos << endl;
 }
 
@@ -265,62 +269,58 @@ void *websocket_server_thread(void *arg)
 {
   printf("This is websocket_server_thread()\n");
 
-    //Deploy a websocket server here and wait for connections sending the state at an specific rate
-	//Create the event loop for the main thread, and the WebSocket server
-	asio::io_service mainEventLoop;
-	WebsocketServer server;
-	
-	//Register our network callbacks, ensuring the logic is run on the main thread's event loop
-	server.connect([&mainEventLoop, &server](ClientConnection conn)
-	{
-		mainEventLoop.post([conn, &server]()
-		{
-			std::clog << "Connection opened." << std::endl;
-			std::clog << "There are now " << server.numConnections() << " open connections." << std::endl;
-			
-			//Send a hello message to the client
-			//server.sendMessage(conn, "hello", Json::Value());
-		});
-	});
-  
-	server.disconnect([&mainEventLoop, &server](ClientConnection conn)
-	{
-		mainEventLoop.post([conn, &server]()
-		{
-			std::clog << "Connection closed." << std::endl;
-			std::clog << "There are now " << server.numConnections() << " open connections." << std::endl;
-		});
-	});
+  // Deploy a websocket server here and wait for connections sending the state at an specific rate
+  // Create the event loop for the main thread, and the WebSocket server
+  asio::io_service mainEventLoop;
+  WebsocketServer server;
 
-	server.message("message", [&mainEventLoop, &server](ClientConnection conn, const Json::Value& args)
-	{
-		mainEventLoop.post([conn, args, &server]()
-		{
-			//std::clog << "message handler on the main thread" << std::endl;
-			//std::clog << "Message payload:" << std::endl;
-			//for (auto key : args.getMemberNames()) {
-			//	std::clog << "\t" << key << ": " << args[key].asString() << std::endl;
-			//}
-			
-			//Echo the message pack to the client
-			server.sendMessage(conn, "message", args);
-		});
-	});
-	
-	//Start the networking thread
-	std::thread serverThread([&server]() {
+  // Register our network callbacks, ensuring the logic is run on the main thread's event loop
+  server.connect([&mainEventLoop, &server](ClientConnection conn)
+                 { mainEventLoop.post([conn, &server]()
+                                      {
+                                        std::clog << "Connection opened." << std::endl;
+                                        std::clog << "There are now " << server.numConnections() << " open connections." << std::endl;
+
+                                        // Send a hello message to the client
+                                        // server.sendMessage(conn, "hello", Json::Value());
+                                      }); });
+
+  server.disconnect([&mainEventLoop, &server](ClientConnection conn)
+                    { mainEventLoop.post([conn, &server]()
+                                         {
+			std::clog << "Connection closed." << std::endl;
+			std::clog << "There are now " << server.numConnections() << " open connections." << std::endl; }); });
+
+  server.message("set_xy_pos", [&mainEventLoop, &server](ClientConnection conn, const Json::Value &args)
+                 {
+                   char buff[255];
+                   // std::clog << "message handler on the main thread" << std::endl;
+/*
+                   std::clog << "Message payload:" << std::endl;
+
+                   for (auto key : args.getMemberNames())
+                   {
+                     std::clog << "\t" << key << ": " << args[key].asString() << std::endl;
+                   }
+*/
+                   //std::cout << "x_pos:" << args["x"].asFloat() << " y_pos:" << args["y"].asFloat() << " z_pos:" << machine_state.z_pos << " tool:" << machine_state.tool_pos;
+                   sprintf(buff, "$p,%.3f,%.3f,%.3f,%d\n", args["x"].asFloat(), args["y"].asFloat(), machine_state.z_ref, machine_state.tool_pos);
+ser.write(string(buff)); });
+
+  // Start the networking thread
+  std::thread serverThread([&server]()
+                           {
     try {
  		   server.run(cfg.websocket_port);
     } catch (websocketpp::exception const & e) {
         std::cout << e.what() << std::endl;
     } catch (...) {
         std::cout << "other exception" << std::endl;
-    }
-	});
-	
-	//Start a keyboard input thread that reads from stdin
-	std::thread inputThread([&server, &mainEventLoop]()
-	{
+    } });
+
+  // Start a keyboard input thread that reads from stdin
+  std::thread inputThread([&server, &mainEventLoop]()
+                          {
 		string input;
     state state_copy;
 
@@ -329,7 +329,7 @@ void *websocket_server_thread(void *arg)
       if (mutex.try_lock())
       {
         state_copy = machine_state;
-        printState(state_copy);
+        //printState(state_copy);
         mutex.unlock();
 
 			  //Broadcast the input to all connected clients (is sent on the network thread)
@@ -337,6 +337,9 @@ void *websocket_server_thread(void *arg)
 			  payload["x_pos"] = std::to_string(state_copy.x_pos);
 			  payload["y_pos"] = std::to_string(state_copy.y_pos);
 			  payload["z_pos"] = std::to_string(state_copy.z_pos);
+			  payload["x_ref"] = std::to_string(state_copy.x_ref);
+			  payload["y_ref"] = std::to_string(state_copy.y_ref);
+			  payload["z_ref"] = std::to_string(state_copy.z_ref);
 			  payload["tool_pos"] = std::to_string(state_copy.tool_pos);
 
 			  server.broadcastMessage("machineState", payload);
@@ -349,12 +352,11 @@ void *websocket_server_thread(void *arg)
       usleep(100000);
 		}
     cout << "Exiting client thread" << endl;
-    mainEventLoop.stop();
-	});
-	
-	//Start the event loop for the main thread
-	asio::io_service::work work(mainEventLoop);
-	mainEventLoop.run();
+    mainEventLoop.stop(); });
+
+  // Start the event loop for the main thread
+  asio::io_service::work work(mainEventLoop);
+  mainEventLoop.run();
 
   cout << "Exiting websocket thread" << endl;
   pthread_exit((void *)"'Exit from Websocket thread'");
@@ -381,16 +383,15 @@ int main(int argc, char **argv)
   signal(SIGINT, &sigsegv_handler);
 
   // ------------- Serial port stuff ------------
-  serial::Serial ser_;
 
   try
   {
-    ser_.setPort(cfg.serial_port);
-    ser_.setBaudrate(cfg.serial_baudrate);
+    ser.setPort(cfg.serial_port);
+    ser.setBaudrate(cfg.serial_baudrate);
     serial::Timeout to = serial::Timeout::simpleTimeout(cfg.serial_timeout);
-    ser_.setTimeout(to);
-    ser_.open();
-    ser_.flush();
+    ser.setTimeout(to);
+    ser.open();
+    ser.flush();
   }
   catch (serial::IOException &e)
   {
@@ -398,7 +399,7 @@ int main(int argc, char **argv)
     exit(-1);
   }
 
-  if (ser_.isOpen())
+  if (ser.isOpen())
   {
     cout << "Serial Port initialized" << endl;
   }
@@ -411,9 +412,9 @@ int main(int argc, char **argv)
   {
     if (mutex.try_lock())
     {
-      while (readStateFromserial(ser_, machine_state))
+      while (readStateFromserial(machine_state))
       {
-        //cout << "Got state from machine" << endl;
+        // cout << "Got state from machine" << endl;
       }
 
       mutex.unlock();
@@ -427,7 +428,7 @@ int main(int argc, char **argv)
     usleep(100000);
   }
 
-  ser_.close();
+  ser.close();
 
   // Waiting for websocket thread to finish
   cout << "waiting for websocket thread to finish" << endl;

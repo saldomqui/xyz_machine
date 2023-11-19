@@ -126,6 +126,7 @@ void WebsocketServer::onClose(ClientConnection conn)
 
 void WebsocketServer::onMessage(ClientConnection conn, WebsocketEndpoint::message_ptr msg)
 {
+	//std::cout << "Message arrived" << std::endl;
 	//Validate that the incoming message contains valid JSON
 	Json::Value messageObject = WebsocketServer::parseJson(msg->get_payload());
 	if (messageObject.isNull() == false)
