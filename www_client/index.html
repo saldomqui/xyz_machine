@@ -33,7 +33,7 @@
 
   <div id="calibration_section_id">
     <img id="cam_img_raw_id">
-    <center><canvas id="canvas_id" onmousemove="mouse(event)" onclick="canvas_click(event)" ></canvas></center><br>
+    <center><canvas id="canvas_id" onmousemove="mouse(event)" onclick="canvas_click(event)"></canvas></center><br>
     <div class="row">
       <div class="col-sm-4">
 
@@ -95,15 +95,19 @@
           </strong></label>&emsp;<input type="number" id="z_ref_id" min="0.0" max="300.0" step="0.03" value="0.0"
           size="20" /><br>
       </form>
-      <input class="set_button" type="button" id="bt_project_img_id" onClick="projectImage()"
-        value="Project image">
+
+      <form>
+        <label for="goto_clicked_pos_id"><strong>go to clicked position:</strong></label>&emsp;<input type="checkbox"
+          id="goto_clicked_pos_id" />
+      </form>
+
+      <input class="set_button" type="button" id="bt_project_img_id" onClick="projectImage()" value="Project image">
     </div>
 
-    <div id="scan_canvas_frame_id" class="dragscroll" >
+    <div id="scan_canvas_frame_id" class="dragscroll">
       <canvas id="scan_canvas_id" onmousemove="mouse(event)" onclick="scan_canvas_click(event)"></canvas>
       <canvas id="scan_canvas_background_id" style="display: none"></canvas>
     </div>
-  </div>
   </div>
 
   <div id="status"> <!-- Status bar-->

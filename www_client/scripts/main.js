@@ -27,6 +27,7 @@ let px_per_mm_coef = 0.0;
 let last_roi_pos = { x: 0, y: 0 };
 let zoom_scale = 1.0;
 let last_canvas_scroll_val = 0;
+let cam_img_raw = 0;
 
 /*
 onwheel = (event) => {
@@ -176,8 +177,9 @@ function scan_canvas_click(e) {
     let y_px = (e.clientY - scanner_canvas.offsetTop + elem.scrollTop) / zoom_scale;
     let xy_mm = getMachineXYFromPxCoods(x_px, y_px);
 
-    console.log("Zoom scale:" + zoom_scale + " Clicked scan canvas at x:" + xy_mm[0] + " y:" + xy_mm[1]);
-    setMachineXYPos(xy_mm[0], xy_mm[1]);
+    console.log("Clicked scan canvas at x:" + xy_mm[0] + " y:" + xy_mm[1]);
+    if (document.getElementById('goto_clicked_pos_id').checked)
+        setMachineXYPos(xy_mm[0], xy_mm[1]);
 }
 
 function zoom(e) {
@@ -376,5 +378,77 @@ function setMachineXYPos(x, y) {
         x: x,
         y: y
     };
+    //console.table(msg);
+    console.log("New pos. X:" + msg.x + " Y:" + msg.y);
     socket_ws.send("set_xy_pos", msg);
 }
+
+
+$(document).ready(function () {
+    //console.log(window.location.href)
+    socket_ws = new SocketWrapper("ws://" + window.location.host + ":8080");
+
+    //Generic events
+
+    socket_ws.on('connect', function () {
+        logStatus("socket is connected!");
+    });
+
+    socket_ws.on('data', function (data) {
+        //log('got message: ' + data)
+    });
+
+    socket_ws.on('close', function () {
+        logStatus("socket is disconnected!");
+    });
+
+    socket_ws.on('error', function (err) {
+        logStatus("Error: " + err);
+    });
+
+    //Specific message type handlers
+
+    socket_ws.on('machineState', function (args) {
+        //log("Received machine state: \"" + args['input'] + "\"");
+        //console.log("x:" + args['x_pos'] + ", y:" + args['y_pos'] + ", z:" + args['z_pos'] + ", tool:" + args['tool_pos']);
+
+        document.getElementById('x_pos_id').value = parseFloat(args['x_pos']).toFixed(3);
+        document.getElementById('y_pos_id').value = parseFloat(args['y_pos']).toFixed(3);
+        document.getElementById('z_pos_id').value = parseFloat(args['z_pos']).toFixed(3);
+        document.getElementById('tool_pos_id').value = parseFloat(args['tool_pos']).toFixed(1);
+        document.getElementById('x_ref_id').value = parseFloat(args['x_ref']).toFixed(3);
+        document.getElementById('y_ref_id').value = parseFloat(args['y_ref']).toFixed(3);
+        document.getElementById('z_ref_id').value = parseFloat(args['z_ref']).toFixed(3);
+    });
+
+    window.addEventListener('keydown', function (e) {
+        let x_pos = parseFloat(this.document.getElementById('x_pos_id').value);
+        let y_pos = parseFloat(this.document.getElementById('y_pos_id').value);
+        console.log("curr pos. x:" + x_pos + " y:" + y_pos);
+        if (e.key == 'ArrowUp') {
+            // up arrow
+            console.log("key up");
+            if (y_pos <= (MACHINE_Y_AXIS_RANGE_MM - 1))
+                setMachineXYPos(x_pos, y_pos - 1.0);
+        }
+        else if (e.key == 'ArrowDown') {
+            // down arrow
+            console.log("key down");
+            if (y_pos >= 1.0)
+                setMachineXYPos(x_pos, y_pos + 1.0);
+        }
+        else if (e.key == 'ArrowLeft') {
+            // left arrow
+            console.log("key left");
+            if (x_pos >= 1.0)
+                setMachineXYPos(x_pos - 1.0, y_pos);
+        }
+        else if (e.key == 'ArrowRight') {
+            // right arrow
+            console.log("key right");
+            if (x_pos <= (MACHINE_X_AXIS_RANGE_MM - 1))
+                setMachineXYPos(x_pos + 1.0, y_pos);
+        }
+    })
+
+});

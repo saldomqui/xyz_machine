@@ -240,3 +240,7 @@ body{
     cursor : -o-grabbing;
     cursor : grabbing;
   }
+
+  #goto_clicked_pos_id{
+    margin-right: 10px;
+  }

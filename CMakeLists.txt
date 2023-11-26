@@ -86,7 +86,8 @@ add_library(jsoncpp STATIC ${PROJECT_SOURCE_DIR}/external/jsoncpp.cpp)
 
 add_executable(xyz_machine
   src/xyz_machine.cpp
-  src/WebsocketServer.cpp
+  src/websocket_server.cpp
+  src/serial_comm.cpp
 )
 
 target_link_libraries(xyz_machine

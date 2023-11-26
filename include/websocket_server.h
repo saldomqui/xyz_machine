@@ -1,5 +1,5 @@
-#ifndef _WEBSOCKET_SERVER
-#define _WEBSOCKET_SERVER
+#ifndef _WEBSOCKET_SERVER_H
+#define _WEBSOCKET_SERVER_H
 
 //We need to define this when using the Asio library without Boost
 #define ASIO_STANDALONE
@@ -86,4 +86,4 @@ class WebsocketServer
 		map<string, vector<std::function<void(ClientConnection, const Json::Value&)>>> messageHandlers;
 };
 
-#endif
+#endif //WEBSOCKET_SERVER_H
